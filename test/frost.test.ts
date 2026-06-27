@@ -10,10 +10,8 @@ import {
   frostSign,
   frostAggregate,
   frostVerifyShare,
-  FrostAggregateError,
   schnorrVerify,
   poseidon,
-  type Point,
 } from "../src/index";
 import { babyjubjub_FROST } from "../src/babyjubjub";
 
@@ -54,7 +52,7 @@ function setupDKG() {
   return { aliceKey, bobKey, carolKey, id };
 }
 
-function groupPubkey(key: Key): Point {
+function groupPubkey(key: Key) {
   const pk = babyjubjub.Point.fromBytes(key.public.commitments[0] as Uint8Array).toAffine();
   return { x: pk.x, y: pk.y };
 }
