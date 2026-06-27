@@ -10,15 +10,25 @@
  */
 import { babyjubjub } from "@noble/curves/misc.js";
 import { createFROST } from "@noble/curves/abstract/frost.js";
-import { sha256 } from "@noble/hashes/sha2.js";
+import { sha512 } from "@noble/hashes/sha2.js";
+import type { EdwardsPoint } from "@noble/curves/abstract/edwards.js";
+import { poseidon } from "./poseidon";
+import { bytesToNumberBE } from "@noble/curves/utils.js";
+import { mod } from "./utils";
 
-export const babyjubjub_FROST = createFROST({
-	name: "babyjubjub-frost",
-	Point: babyjubjub.Point,
-	// noble's CHash types its output as Uint8Array<ArrayBufferLike>, which doesn't
-	// structurally match createFROST's ArrayBuffer-branded hash signature.
-	hash: sha256,
-});
+type P = EdwardsPoint;
 
 export const ORDER = babyjubjub.Point.CURVE().n;
 export const BASE = babyjubjub.Point.BASE;
+export const Fn = babyjubjub.Point.Fn;
+
+export function challenge(R: P, PK: P, msg: Uint8Array): bigint {
+	return mod(poseidon([R.x, R.y, PK.x, PK.y, bytesToNumberBE(msg)]), ORDER);
+}
+
+export const babyjubjub_FROST = createFROST({
+	name: "FROST-BABYJUBJUB-SHA512-v1",
+	Point: babyjubjub.Point,
+	hash: sha512,
+	challenge
+});
