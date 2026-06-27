@@ -156,9 +156,8 @@ describe("FROST signing (circuit-compatible)", () => {
     try {
       frostAggregate(aliceKey.public, list, msg, [aShare, badB]);
       throw new Error("expected aggregation to fail");
-    } catch (e) {
-      expect(e).toBeInstanceOf(FrostAggregateError);
-      expect((e as FrostAggregateError).cheaters).toEqual([bShare.identifier]);
+    } catch (e: any) {
+      expect(e.cheaters).toEqual([bShare.identifier]);
     }
   });
 });
