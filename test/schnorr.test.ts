@@ -14,19 +14,19 @@ describe("Schnorr (Poseidon challenge, s = k - e*sk)", () => {
 	const message = poseidon([1n, 2n, 3n]);
 
 	it("a valid signature verifies", () => {
-		const sig = schnorrSign({ key, message });
+		const sig = schnorrSign({ secretKey: key, message });
 		expect(schnorrVerify({ signature: sig, pubkey, message })).toBe(true);
 	});
 
 	it("a wrong message fails", () => {
-		const sig = schnorrSign({ key, message });
+		const sig = schnorrSign({ secretKey: key, message });
 		expect(
 			schnorrVerify({ signature: sig, pubkey, message: message + 1n }),
 		).toBe(false);
 	});
 
 	it("a wrong public key fails", () => {
-		const sig = schnorrSign({ key, message });
+		const sig = schnorrSign({ secretKey: key, message });
 		const otherPt = BASE.multiply(mod(999n, ORDER)).toAffine();
 		expect(
 			schnorrVerify({
@@ -38,7 +38,7 @@ describe("Schnorr (Poseidon challenge, s = k - e*sk)", () => {
 	});
 
 	it("a tampered s fails", () => {
-		const sig = schnorrSign({ key, message });
+		const sig = schnorrSign({ secretKey: key, message });
 		expect(
 			schnorrVerify({
 				signature: { s: mod(sig.s + 1n, ORDER), e: sig.e },
