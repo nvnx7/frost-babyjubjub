@@ -2,9 +2,6 @@ import { describe, expect, it } from "bun:test";
 import { babyjubjub } from "@noble/curves/misc.js";
 import type { DKG_Round2, Key } from "@noble/curves/abstract/frost.js";
 import {
-  dkgRound1,
-  dkgRound2,
-  dkgRound3,
   serializeDkgRound1,
   deserializeDkgRound1,
   serializeDkgRound3,
@@ -27,9 +24,9 @@ function setupDKG() {
   const addrs = { alice: "alice", bob: "bob", carol: "carol" } as const;
 
   const r1 = {
-    alice: dkgRound1({ address: addrs.alice, threshold, total }),
-    bob: dkgRound1({ address: addrs.bob, threshold, total }),
-    carol: dkgRound1({ address: addrs.carol, threshold, total }),
+    alice: babyjubjub_FROST.DKG.round1(babyjubjub_FROST.Identifier.derive(addrs.alice), { min: threshold, max: total }),
+    bob: babyjubjub_FROST.DKG.round1(babyjubjub_FROST.Identifier.derive(addrs.bob), { min: threshold, max: total }),
+    carol: babyjubjub_FROST.DKG.round1(babyjubjub_FROST.Identifier.derive(addrs.carol), { min: threshold, max: total }),
   };
 
   const othersR1 = {
@@ -39,9 +36,9 @@ function setupDKG() {
   };
 
   const r2 = {
-    alice: dkgRound2({ myRound1Secret: r1.alice.secret, othersRound1Public: othersR1.alice }),
-    bob: dkgRound2({ myRound1Secret: r1.bob.secret, othersRound1Public: othersR1.bob }),
-    carol: dkgRound2({ myRound1Secret: r1.carol.secret, othersRound1Public: othersR1.carol }),
+    alice: babyjubjub_FROST.DKG.round2(r1.alice.secret, othersR1.alice),
+    bob: babyjubjub_FROST.DKG.round2(r1.bob.secret, othersR1.bob),
+    carol: babyjubjub_FROST.DKG.round2(r1.carol.secret, othersR1.carol),
   };
 
   const id = {
@@ -50,21 +47,9 @@ function setupDKG() {
     carol: babyjubjub_FROST.Identifier.derive(addrs.carol),
   };
 
-  const aliceKey = dkgRound3({
-    myRound1Secret: r1.alice.secret,
-    othersRound1Public: othersR1.alice,
-    othersRound2Public: [r2.bob[id.alice], r2.carol[id.alice]] as DKG_Round2[],
-  });
-  const bobKey = dkgRound3({
-    myRound1Secret: r1.bob.secret,
-    othersRound1Public: othersR1.bob,
-    othersRound2Public: [r2.alice[id.bob], r2.carol[id.bob]] as DKG_Round2[],
-  });
-  const carolKey = dkgRound3({
-    myRound1Secret: r1.carol.secret,
-    othersRound1Public: othersR1.carol,
-    othersRound2Public: [r2.alice[id.carol], r2.bob[id.carol]] as DKG_Round2[],
-  });
+  const aliceKey = babyjubjub_FROST.DKG.round3(r1.alice.secret, othersR1.alice, [r2.bob[id.alice], r2.carol[id.alice]] as DKG_Round2[]);
+  const bobKey = babyjubjub_FROST.DKG.round3(r1.bob.secret, othersR1.bob, [r2.alice[id.bob], r2.carol[id.bob]] as DKG_Round2[]);
+  const carolKey = babyjubjub_FROST.DKG.round3(r1.carol.secret, othersR1.carol, [r2.alice[id.carol], r2.bob[id.carol]] as DKG_Round2[]);
 
   return { aliceKey, bobKey, carolKey, id };
 }
@@ -82,7 +67,7 @@ describe("FROST DKG", () => {
   });
 
   it("round1 serialization round-trips", () => {
-    const r1 = dkgRound1({ address: "alice", threshold: 2, total: 3 });
+    const r1 = babyjubjub_FROST.DKG.round1(babyjubjub_FROST.Identifier.derive("alice"), { min: 2, max: 3 });
     const restored = deserializeDkgRound1(serializeDkgRound1(r1));
     expect(restored.public.identifier).toBe(r1.public.identifier);
     expect(restored.secret.identifier).toBe(r1.secret.identifier);

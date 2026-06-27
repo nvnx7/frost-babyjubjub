@@ -4,9 +4,6 @@ import {
 	deserializeNonceCommitments,
 	deserializeNonces,
 	deserializeSignatureShare,
-	dkgRound1,
-	dkgRound2,
-	dkgRound3,
 	frostCommit,
 	serializeFrostSignature,
 	serializeNonceCommitments,
@@ -17,22 +14,12 @@ import { babyjubjub_FROST } from "../src/babyjubjub";
 
 function aliceKey() {
 	// 2-of-2 DKG to obtain a usable FrostSecret for frostCommit.
-	const a = dkgRound1({ address: "alice", threshold: 2, total: 2 });
-	const b = dkgRound1({ address: "bob", threshold: 2, total: 2 });
-	const aR2 = dkgRound2({
-		myRound1Secret: a.secret,
-		othersRound1Public: [b.public],
-	});
-	const bR2 = dkgRound2({
-		myRound1Secret: b.secret,
-		othersRound1Public: [a.public],
-	});
+	const a = babyjubjub_FROST.DKG.round1(babyjubjub_FROST.Identifier.derive("alice"), { min: 2, max: 2 });
+	const b = babyjubjub_FROST.DKG.round1(babyjubjub_FROST.Identifier.derive("bob"), { min: 2, max: 2 });
+	const aR2 = babyjubjub_FROST.DKG.round2(a.secret, [b.public]);
+	const bR2 = babyjubjub_FROST.DKG.round2(b.secret, [a.public]);
 	const aliceId = babyjubjub_FROST.Identifier.derive("alice");
-	return dkgRound3({
-		myRound1Secret: a.secret,
-		othersRound1Public: [b.public],
-		othersRound2Public: [bR2[aliceId]!],
-	});
+	return babyjubjub_FROST.DKG.round3(a.secret, [b.public], [bR2[aliceId]!]);
 }
 
 describe("sign-phase serialization", () => {

@@ -1,6 +1,6 @@
 /**
  * (De)serialization for the DKG round packages — kept separate from the round
- * logic in ./dkg.ts so the protocol functions stay free of transport concerns.
+ * logic in babyjubjub_FROST.DKG so the protocol functions stay free of transport concerns.
  * All wire forms are JSON-friendly (hex strings / decimal strings).
  */
 import type {
