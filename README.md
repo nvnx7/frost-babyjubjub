@@ -16,31 +16,36 @@ It uses a Poseidon-based challenge and the $s = k - e \cdot sk$ signing equation
 A threshold setup requires $t$-of-$n$ participants (e.g. 2-of-3). The DKG process is done in 3 rounds.
 
 ```typescript
-import { dkgRound1, dkgRound2, dkgRound3 } from "frost-babyjubjub";
+import { babyjubjub_FROST } from "frost-babyjubjub";
 
 const threshold = 2;
 const total = 3;
 
+// Derive identifiers
+const aliceId = babyjubjub_FROST.Identifier.derive("alice");
+const bobId = babyjubjub_FROST.Identifier.derive("bob");
+const carolId = babyjubjub_FROST.Identifier.derive("carol");
+
 // Round 1 (Each participant)
-const aliceR1 = dkgRound1({ address: "alice", threshold, total });
-const bobR1 = dkgRound1({ address: "bob", threshold, total });
-const carolR1 = dkgRound1({ address: "carol", threshold, total });
+const aliceR1 = babyjubjub_FROST.DKG.round1(aliceId, { min: threshold, max: total });
+const bobR1 = babyjubjub_FROST.DKG.round1(bobId, { min: threshold, max: total });
+const carolR1 = babyjubjub_FROST.DKG.round1(carolId, { min: threshold, max: total });
 
 // Broadcast Round 1 Public Data to all participants...
 
 // Round 2 (Alice generates shares for others)
-const aliceR2 = dkgRound2({
-  myRound1Secret: aliceR1.secret,
-  othersRound1Public: [bobR1.public, carolR1.public]
-});
+const aliceR2 = babyjubjub_FROST.DKG.round2(
+  aliceR1.secret,
+  [bobR1.public, carolR1.public]
+);
 // (Bob and Carol do the same...)
 
 // Round 3 (Compute the final key share)
-const aliceKey = dkgRound3({
-  myRound1Secret: aliceR1.secret,
-  othersRound1Public: [bobR1.public, carolR1.public],
-  othersRound2Public: [bobR2[aliceId], carolR2[aliceId]], 
-});
+const aliceKey = babyjubjub_FROST.DKG.round3(
+  aliceR1.secret,
+  [bobR1.public, carolR1.public],
+  [bobR2[aliceId], carolR2[aliceId]], 
+);
 
 // aliceKey contains both her secret share and the group public key!
 ```
@@ -88,9 +93,9 @@ console.log(isValid); // true
 ## API Reference
 
 ### DKG
-- `dkgRound1(opts: DkgRound1Opts)`: Generates initial public/secret values.
-- `dkgRound2(opts: DkgRound2Opts)`: Computes secret shares for other participants.
-- `dkgRound3(opts: DkgRound3Opts)`: Finalizes the group key and individual signing share.
+- `babyjubjub_FROST.DKG.round1(identifier, signers)`: Generates initial public/secret values.
+- `babyjubjub_FROST.DKG.round2(secret, round1)`: Computes secret shares for other participants.
+- `babyjubjub_FROST.DKG.round3(secret, round1, round2)`: Finalizes the group key and individual signing share.
 
 ### FROST Signing
 - `frostCommit(secret: FrostSecret)`: Generates hiding/binding nonces and their commitments.
@@ -99,7 +104,7 @@ console.log(isValid); // true
 - `frostVerifyShare(pub, commitmentList, msg, identifier, sigShare)`: Verifies a single participant's signature share.
 
 ### Serialization
-All types can be securely serialized/deserialized to share across network boundaries:
+All types can be serialized/deserialized to share across network boundaries:
 - `serializeDkgRound1` / `deserializeDkgRound1`
 - `serializeDkgRound3` / `deserializeDkgRound3`
 - `serializeNonceCommitments` / `deserializeNonceCommitments`
