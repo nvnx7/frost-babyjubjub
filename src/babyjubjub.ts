@@ -23,7 +23,7 @@ export const ORDER = babyjubjub.Point.CURVE().n;
 export const BASE = babyjubjub.Point.BASE;
 export const Fn = babyjubjub.Point.Fn;
 
-export function challenge(R: P, PK: P, msg: Uint8Array): bigint {
+function challenge(R: P, PK: P, msg: Uint8Array): bigint {
   return mod(poseidon([R.x, R.y, PK.x, PK.y, bytesToNumberBE(msg)]), ORDER);
 }
 
