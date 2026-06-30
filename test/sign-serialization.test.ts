@@ -1,16 +1,16 @@
 import { describe, expect, test } from "bun:test";
 import {
-  deserializeFrostSignature,
   deserializeNonceCommitments,
   deserializeNonces,
+  deserializeSchnorrSignature,
   deserializeSignatureShare,
   dkgRound1,
   dkgRound2,
   dkgRound3,
   frostCommit,
-  serializeFrostSignature,
   serializeNonceCommitments,
   serializeNonces,
+  serializeSchnorrSignature,
   serializeSignatureShare,
 } from "../src/index";
 
@@ -53,7 +53,7 @@ describe("sign-phase serialization", () => {
     );
 
     const sig = { s: 111n, e: 222n };
-    expect(deserializeFrostSignature(serializeFrostSignature(sig))).toEqual(
+    expect(deserializeSchnorrSignature(serializeSchnorrSignature(sig))).toEqual(
       sig,
     );
   });
