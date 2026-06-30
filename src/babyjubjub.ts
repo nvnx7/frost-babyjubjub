@@ -24,12 +24,12 @@ export const BASE = babyjubjub.Point.BASE;
 export const Fn = babyjubjub.Point.Fn;
 
 function challenge(R: P, PK: P, msg: Uint8Array): bigint {
-  return mod(poseidon([R.x, R.y, PK.x, PK.y, bytesToNumberBE(msg)]), ORDER);
+	return mod(poseidon([R.x, R.y, PK.x, PK.y, bytesToNumberBE(msg)]), ORDER);
 }
 
 export const babyjubjub_FROST = createFROST({
-  name: "FROST-BABYJUBJUB-SHA512-v1",
-  Point: babyjubjub.Point,
-  hash: sha512,
-  challenge,
+	name: "FROST-BABYJUBJUB-SHA512-v1",
+	Point: babyjubjub.Point,
+	hash: sha512,
+	challenge,
 });
