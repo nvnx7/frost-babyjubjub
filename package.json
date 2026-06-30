@@ -1,31 +1,39 @@
 {
-  "name": "frost-babyjubjub",
-  "license": "MIT",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "scripts": {
-    "test": "bun test",
-    "format": "biome format --write .",
-    "lint": "biome check .",
-    "build": "bun build ./src/index.ts --outdir ./dist && tsc",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@noble/curves": "^2.2.0",
-    "@noble/hashes": "^2.2.0"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.5.1",
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  }
+	"name": "frost-babyjubjub",
+	"license": "MIT",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./circuits/schnorr_verify.circom": "./circuits/schnorr_verify.circom"
+	},
+	"files": [
+		"dist",
+		"circuits"
+	],
+	"scripts": {
+		"test": "bun test",
+		"format": "biome format --write .",
+		"lint": "biome check .",
+		"build": "bun build ./src/index.ts --outdir ./dist && tsc",
+		"typecheck": "tsc --noEmit",
+		"circuits:build": "mkdir -p build/circuits && circom test/circuits/test_schnorr.circom --wasm --r1cs -o build/circuits -l node_modules"
+	},
+	"dependencies": {
+		"@noble/curves": "^2.2.0",
+		"@noble/hashes": "^2.2.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.1",
+		"@types/bun": "latest",
+		"circomlib": "^2.0.5",
+		"snarkjs": "^0.7.6"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
 }
