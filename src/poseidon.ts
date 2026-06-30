@@ -1,9 +1,9 @@
-import { babyjubjub } from "@noble/curves/misc.js";
+import type { PoseidonFn } from "@noble/curves/abstract/poseidon.js";
 import {
 	grainGenConstants,
 	poseidon as noblePoseidon,
 } from "@noble/curves/abstract/poseidon.js";
-import type { PoseidonFn } from "@noble/curves/abstract/poseidon.js";
+import { babyjubjub } from "@noble/curves/misc.js";
 
 // The BabyJubJub prime field. All Poseidon inputs and outputs live in this field.
 const Fp = babyjubjub.Point.Fp;

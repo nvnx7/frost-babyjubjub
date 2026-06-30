@@ -1,33 +1,28 @@
 import { describe, expect, test } from "bun:test";
 import {
-	deserializeFrostSignature,
 	deserializeNonceCommitments,
 	deserializeNonces,
+	deserializeSchnorrSignature,
 	deserializeSignatureShare,
 	dkgRound1,
 	dkgRound2,
 	dkgRound3,
 	frostCommit,
-	serializeFrostSignature,
 	serializeNonceCommitments,
 	serializeNonces,
+	serializeSchnorrSignature,
 	serializeSignatureShare,
 } from "../src/index";
-import { babyjubjub_FROST } from "../src/babyjubjub";
 
 function aliceKey() {
 	// 2-of-2 DKG to obtain a usable FrostSecret for frostCommit.
 	const a = dkgRound1({ address: "alice", threshold: 2, total: 2 });
 	const b = dkgRound1({ address: "bob", threshold: 2, total: 2 });
-	const aR2 = dkgRound2({
-		myRound1Secret: a.secret,
-		othersRound1Public: [b.public],
-	});
 	const bR2 = dkgRound2({
 		myRound1Secret: b.secret,
 		othersRound1Public: [a.public],
 	});
-	const aliceId = babyjubjub_FROST.Identifier.derive("alice");
+	const aliceId = a.public.identifier;
 	return dkgRound3({
 		myRound1Secret: a.secret,
 		othersRound1Public: [b.public],
@@ -58,7 +53,7 @@ describe("sign-phase serialization", () => {
 		);
 
 		const sig = { s: 111n, e: 222n };
-		expect(deserializeFrostSignature(serializeFrostSignature(sig))).toEqual(
+		expect(deserializeSchnorrSignature(serializeSchnorrSignature(sig))).toEqual(
 			sig,
 		);
 	});

@@ -1,6 +1,6 @@
 /**
  * (De)serialization for the DKG round packages — kept separate from the round
- * logic in ./dkg.ts so the protocol functions stay free of transport concerns.
+ * logic in babyjubjub_FROST.DKG so the protocol functions stay free of transport concerns.
  * All wire forms are JSON-friendly (hex strings / decimal strings).
  */
 import type {
@@ -8,11 +8,11 @@ import type {
 	DKG_Round2,
 	DKG_Secret,
 	Key,
-	Nonces,
 	NonceCommitments,
+	Nonces,
 } from "@noble/curves/abstract/frost.js";
 import { bytesToHex, hexToBytes } from "@noble/curves/utils.js";
-import type { FrostSignature } from "./signature";
+import type { SchnorrSignature } from "./schnorr";
 
 // ── Round 1 ────────────────────────────────────────────────────────────────
 
@@ -234,16 +234,16 @@ export function deserializeSignatureShare(
 	return { identifier: data.identifier, z: BigInt(data.z) };
 }
 
-export type SerializedFrostSignature = { s: string; e: string };
+export type SerializedSchnorrSignature = { s: string; e: string };
 
-export function serializeFrostSignature(
-	sig: FrostSignature,
-): SerializedFrostSignature {
+export function serializeSchnorrSignature(
+	sig: SchnorrSignature,
+): SerializedSchnorrSignature {
 	return { s: sig.s.toString(), e: sig.e.toString() };
 }
 
-export function deserializeFrostSignature(
-	data: SerializedFrostSignature,
-): FrostSignature {
+export function deserializeSchnorrSignature(
+	data: SerializedSchnorrSignature,
+): SchnorrSignature {
 	return { s: BigInt(data.s), e: BigInt(data.e) };
 }
