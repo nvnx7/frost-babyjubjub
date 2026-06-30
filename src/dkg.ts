@@ -1,8 +1,8 @@
 /**
- * Distributed Key Generation
+ * Distributed Key Generation (DKG)
  *
  * These functions operate purely on noble's native types — they do NOT serialize
- * their output. Use the helpers in ./serialization.ts to move packages over the
+ * their output. Use the helpers in serialization.ts to move packages over the
  * wire / through storage.
  */
 import type {
@@ -44,7 +44,7 @@ export function dkgRound2(params: {
 
 /**
  * Round 3: finalize the key from the received round-1 and round-2 packages.
- * Returns this participant's final {@link Key} (group public key + signing share).
+ * Returns this participant's final (group public key + signing share).
  */
 export function dkgRound3(params: {
   myRound1Secret: DKG_Secret;
